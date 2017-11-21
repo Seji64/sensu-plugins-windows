@@ -44,7 +44,8 @@ $instance_counter = New-Object Diagnostics.PerformanceCounter
 $instance_counter.CategoryName = $Category
 $instance_counter.CounterName = 'System Up Time'
 
-$value = $instance_counter.NextSample().RawValue
+$instance_counter.NextValue()
+$value = $instance_counter.NextValue()
 $value = [System.Math]::Truncate($value)
 
 $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
