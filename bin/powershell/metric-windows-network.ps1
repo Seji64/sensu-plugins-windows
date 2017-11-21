@@ -35,41 +35,34 @@ $ThisProcess.PriorityClass = "BelowNormal"
 
 if ($UseFullyQualifiedHostname -eq $false) {
     $Hostname = ($env:computername).ToLower()
-}else {
+}else{
     $Hostname = [System.Net.Dns]::GetHostEntry([string]"localhost").HostName.toLower()
 }
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'Network Interface'
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
+$Category = 'Network Interface'
+$perf_category = New-Object Diagnostics.PerformanceCounterCategory($Category)
 
-for($i = 0; $i -lt $Interfaces.Count; $i+=1) {
-    $tmp = $Interfaces[$i]
-    $Interfaces[$i] = $tmp.Replace("_"," ")
-}
+foreach ($interface_instance in $perf_category.GetInstanceNames()) {
 
-foreach ($ObjNet in (Get-Counter -Counter "\$localizedCategoryName(*)\*").CounterSamples) 
-{ 
+    if ($Interfaces.Contains($interface_instance)) {
 
-  if ($Interfaces.Contains($ObjNet.InstanceName)) {
+       foreach($counter in $perf_category.GetCounters($interface_instance)) {
+            
+            $countername =  $counter.CounterName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace "/sec","per_second" -replace ":",""
+            $instancename = $counter.InstanceName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace ":",""
 
-     $Measurement = ($ObjNet.Path).Trim("\\") -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]",""
+            $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
 
-	 $Measurement = $Measurement.Remove(0,$Measurement.IndexOf("."))   
-	 $Path = $Hostname+$Measurement
+            $value = 1..10|%{$counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+            $value = [System.Math]::Round($value)
 
-     $Path = $Path.Replace("/s","_per_second")
-     $Path = $Path.Replace(":","")
-     $Path = $Path.Replace(",","")
-     $Path = $Path.Replace("ä","ae")
-     $Path = $Path.Replace("ö","oe")
-     $Path = $Path.Replace("ü","ue")
-	 $Path = $Path.Replace("ß","ss")
+            $Path = $Hostname+'.'+$instancename+'.'+$countername
+            $Path = $Path.ToLower()
 
-     $Value = [System.Math]::Round(($ObjNet.CookedValue),0)
-     $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
+            Write-Host "$Path $Value $Time"
 
-     Write-Host "$Path $Value $Time"
+       }
 
-   }
+    }
 
 }

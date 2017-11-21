@@ -38,9 +38,7 @@ if ($UseFullyQualifiedHostname -eq $false) {
     $Path = [System.Net.Dns]::GetHostEntry([string]"localhost").HostName.toLower()
 }
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'Processor Information'
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
-
+$Category = 'Processor Information'
 $counters =  New-Object System.Collections.ArrayList
 
 [void]$counters.Add('% Processor Time')
@@ -50,15 +48,19 @@ $counters =  New-Object System.Collections.ArrayList
 
 foreach ($counter in $counters) {
 
-$perfCounterID = Get-PerformanceCounterByID -Name $counter
-$localizedCounterName = Get-PerformanceCounterLocalName -ID $perfCounterID
-$value = [System.Math]::Round((Get-Counter "\$localizedCategoryName(_total)\$localizedCounterName" -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue)
+	$instance_counter=New-Object Diagnostics.PerformanceCounter
+	$instance_counter.CategoryName = $Category
+    $instance_counter.InstanceName = '_total'
+	$instance_counter.CounterName = $counter
 
-$Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
+	$Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
 
-if ($counter -eq '% Processor Time') { Write-Host "$Path.cpu.percent.total $value $Time" }
-if ($counter -eq '% Idle Time') { Write-Host "$Path.cpu.percent.idle $value $Time" }
-if ($counter -eq '% User Time') { Write-Host "$Path.cpu.percent.user $value $Time" }
-if ($counter -eq '% Interrupt Time') { Write-Host "$Path.cpu.percent.user $value $Time" }
+	$value = 1..10|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+
+	if ($counter -eq '% Processor Time') { Write-Host "$Path.cpu.percent.total $value $Time" }
+	if ($counter -eq '% Idle Time') { Write-Host "$Path.cpu.percent.idle $value $Time" }
+	if ($counter -eq '% User Time') { Write-Host "$Path.cpu.percent.user $value $Time" }
+	if ($counter -eq '% Interrupt Time') { Write-Host "$Path.cpu.percent.user $value $Time" }
+
 
 }

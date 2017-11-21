@@ -22,21 +22,31 @@
 #   Copyright 2016 sensu-plugins
 #   Released under the same terms as Sensu (the MIT license); see LICENSE for details.
 #
+
+param(
+    [switch]$UseFullyQualifiedHostname
+    )
+
 $ThisProcess = Get-Process -Id $pid
 $ThisProcess.PriorityClass = "BelowNormal"
 
 . (Join-Path $PSScriptRoot perfhelper.ps1)
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'System'
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
+if ($UseFullyQualifiedHostname -eq $false) {
+    $Path = ($env:computername).ToLower()
+}else{
+    $Path = [System.Net.Dns]::GetHostEntry([string]"localhost").HostName.toLower()
+}
 
-$perfCounterID = Get-PerformanceCounterByID -Name 'System Up Time'
-$localizedCounterName = Get-PerformanceCounterLocalName -ID $perfCounterID
 
-$Counter = ((Get-Counter "\$localizedCategoryName\$localizedCounterName").CounterSamples)
+$Category = 'System'
+$instance_counter = New-Object Diagnostics.PerformanceCounter
+$instance_counter.CategoryName = $Category
+$instance_counter.CounterName = 'System Up Time'
 
-$Path = ($Counter.Path).Trim("\\") -replace " ","_" -replace "\\","." -replace "[\{\}]","" -replace "[\[\]]",""
-$Value = [System.Math]::Truncate($Counter.CookedValue)
+$value = $instance_counter.NextSample().RawValue
+$value = [System.Math]::Truncate($value)
+
 $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
 
-Write-Host "$Path $Value $Time"
+Write-Host "$Path.system.uptime $Value $Time"

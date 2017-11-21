@@ -34,23 +34,29 @@ $ThisProcess.PriorityClass = "BelowNormal"
 
 if ($UseFullyQualifiedHostname -eq $false) {
     $Path = ($env:computername).ToLower()
-}else {
+}else{
     $Path = [System.Net.Dns]::GetHostEntry([string]"localhost").HostName.toLower()
 }
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'Processor Information'
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
-$perfCounterID = Get-PerformanceCounterByID -Name 'Interrupts/sec'
-$localizedCounterName = Get-PerformanceCounterLocalName -ID $perfCounterID
-$count_interrupt = [System.Math]::Round((Get-Counter "\$localizedCategoryName(_total)\$localizedCounterName" -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue)
+$Category = 'Processor Information'
+$instance_counter = New-Object Diagnostics.PerformanceCounter
+$instance_counter.CategoryName = $Category
+$instance_counter.InstanceName = '_total'
+$instance_counter.CounterName = 'Interrupts/sec'
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'System'
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
-$perfCounterID = Get-PerformanceCounterByID -Name 'Context Switches/sec'
-$localizedCounterName = Get-PerformanceCounterLocalName -ID $perfCounterID
-$count_context = [System.Math]::Round((Get-Counter "\$localizedCategoryName\$localizedCounterName" -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue)
+$value_interrupt = 1..10|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+$value_interrupt = [System.Math]::Round($value_interrupt)
+
+
+$Category = 'System'
+$instance_counter = New-Object Diagnostics.PerformanceCounter
+$instance_counter.CategoryName = $Category
+$instance_counter.CounterName = 'Context Switches/sec'
+
+$value_context = 1..10|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+$value_context = [System.Math]::Round($value_context)
 
 $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
 
-Write-Host "$Path.system.irq_per_second $count_interrupt $Time"
-Write-Host "$Path.system.context_switches_per_second $count_context $Time"
+Write-Host "$Path.system.irq_per_second $value_interrupt $Time"
+Write-Host "$Path.system.context_switches_per_second $value_context $Time"
