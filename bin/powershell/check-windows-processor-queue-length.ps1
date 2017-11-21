@@ -37,7 +37,13 @@ Param(
 $ThisProcess = Get-Process -Id $pid
 $ThisProcess.PriorityClass = "BelowNormal"
 
-$Value = (Get-WmiObject Win32_PerfFormattedData_PerfOS_System).ProcessorQueueLength
+$Category = 'System'
+$instance_counter = New-Object Diagnostics.PerformanceCounter
+$instance_counter.CategoryName = $Category
+$instance_counter.CounterName = 'Processor Queue Length'
+
+$Value = 1..5|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+$value = [System.Math]::Round($value)
 
 If ($Value -gt $CRITICAL) {
   Write-Host CheckWindowsProcessorQueueLength CRITICAL: Processor Queue at $Value.

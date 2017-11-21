@@ -39,19 +39,21 @@ Param(
 $ThisProcess = Get-Process -Id $pid
 $ThisProcess.PriorityClass = "BelowNormal"
 
-$perfCategoryID = Get-PerformanceCounterByID -Name 'Processor Information'
-$perfCounterID = Get-PerformanceCounterByID -Name '% Processor Time'
+$Category = 'Processor Information'
 
-$localizedCategoryName = Get-PerformanceCounterLocalName -ID $perfCategoryID
-$localizedCounterName = Get-PerformanceCounterLocalName -ID $perfCounterID
+$instance_counter = New-Object Diagnostics.PerformanceCounter
+$instance_counter.CategoryName = $Category
+$instance_counter.InstanceName = '_total'
+$instance_counter.CounterName = '% Processor Time'
 
-$Value = [System.Math]::Round((Get-Counter "\$localizedCategoryName(_total)\$localizedCounterName" -SampleInterval 1 -MaxSamples 1).CounterSamples.CookedValue)
+$value = 1..5|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
+$value = [System.Math]::Round($value)
 
-If ($Value -gt $CRITICAL) {
+If ($value -gt $CRITICAL) {
   Write-Host CheckWindowsCpuLoad CRITICAL: CPU at $Value%.
   Exit 2 }
 
-If ($Value -gt $WARNING) {
+If ($value -gt $WARNING) {
   Write-Host CheckWindowsCpuLoad WARNING: CPU at $Value%.
   Exit 1
 }
