@@ -39,6 +39,11 @@ if ($UseFullyQualifiedHostname -eq $false) {
     $Hostname = [System.Net.Dns]::GetHostEntry([string]"localhost").HostName.toLower()
 }
 
+for($i = 0; $i -lt $Interfaces.Count; $i+=1) {
+    $tmp = $Interfaces[$i]
+    $Interfaces[$i] = $tmp.Replace("_"," ")
+}
+
 $Category = 'Network Interface'
 $perf_category = New-Object Diagnostics.PerformanceCounterCategory($Category)
 
@@ -56,7 +61,7 @@ foreach ($interface_instance in $perf_category.GetInstanceNames()) {
             $value = 1..10|%{$counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
             $value = [System.Math]::Round($value)
 
-            $Path = $Hostname+'.'+$instancename+'.'+$countername
+            $Path = $Hostname+'.interface.'+$instancename+'.'+$countername
             $Path = $Path.ToLower()
 
             Write-Host "$Path $Value $Time"
