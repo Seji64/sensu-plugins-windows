@@ -1,9 +1,44 @@
 # Change Log
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachangelog.com/).
+This CHANGELOG follows the format listed at [Our CHANGELOG Guidelines ](https://github.com/sensu-plugins/community/blob/master/HOW_WE_CHANGELOG.md).
+Which is based on [Keep A Changelog](http://keepachangelog.com/)
 
 ## [Unreleased]
+
+### Added
+- minimal `appveyor.yml` (@majormoses)
+- badges for `slack` and `appveyor` (@majormoses)
+
+## [2.3.0] - 2017-11-12
+### Added
+- new check: `powershell/check-multi-template/check-processes.ps1` (@absolutejam)
+- new check `powershell/check-multi-template/check-services.ps1` (@absolutejam)
+- new check `powershell/check-multi-template/check-multi-template.ps1` (@absolutejam)
+- new check `powershell/check-multi-template/check-iscsi.ps1` (@absolutejam)
+- new check `powershell/check-multi-template/check-focusedprocess.ps1` (@absolutejam)
+- new check: `powershell/check-multi-template/check-adapters.ps1` (@absolutejam)
+- documentation `powershell/check-multi-template/README.md` (@absolutejam)
+
+## [2.2.1] - 2017-09-25
+### Changed
+- update changelog guidelines location (@majormoses)
+### Fixed
+- `check-windows-service.rb`: allow service names to have spaces in them (@bodgit)
+
+## [2.2.0] - 2017-09-08
+### Fixed
+- added multi language support to all the powershell scripts (@Seji64)
+- powershell/metric-windows-network.ps1: handle interfaces with spaces in their name (@Seji64)
+- Calculate correct Unix Timestamp (@Seji64)
+
+### Added
+- `powershell/perfhelper.ps1`: added standard sensu header (@Seji64)
+- added option to enable fdqn in metric path (@Seji64)
+- `powershell/metric-windows-disk.ps1` new metric script for disk IO stats (@Seji64)
+- `powershell/metric-windows-system.ps1` new metric script for system related stats (@Seji64)
+
+
 ### [2.1.0] - 2017-08-26
 ### Added
 - `powershell/check-windows-pagefile.ps1`: which basically allows checking how much pagefile (aka swap) is in use. (@hulkk)
@@ -103,7 +138,10 @@ This CHANGELOG follows the format listed at [Keep A Changelog](http://keepachang
 ### Added
 - Initial release
 
-[Unreleased]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.2.1...HEAD
+[2.3.0]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.2.1...2.3.0
+[2.2.1]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.2.0...2.2.1
+[2.2.0]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/1.0.0...2.0.0
 [1.0.0]: https://github.com/sensu-plugins/sensu-plugins-Windows/compare/0.1.0...1.0.0
