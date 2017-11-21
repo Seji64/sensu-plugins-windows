@@ -51,7 +51,7 @@ foreach ($interface_instance in $perf_category.GetInstanceNames()) {
 
     if ($Interfaces.Contains($interface_instance)) {
 
-       foreach($counter in $perf_category.GetCounters($interface_instance)) {
+       foreach($counter in $perf_category.GetCounters($interface_instance.toLower())) {
             
             $countername =  $counter.CounterName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace "/sec","_per_second" -replace ":",""
             $instancename = $counter.InstanceName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace ":",""
