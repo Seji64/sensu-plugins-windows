@@ -53,7 +53,7 @@ foreach ($interface_instance in $perf_category.GetInstanceNames()) {
 
        foreach($counter in $perf_category.GetCounters($interface_instance)) {
             
-            $countername =  $counter.CounterName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace "/sec","per_second" -replace ":",""
+            $countername =  $counter.CounterName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace "/sec","_per_second" -replace ":",""
             $instancename = $counter.InstanceName -replace "\\","." -replace " ","_" -replace "[(]","." -replace "[)]","" -replace "[\{\}]","" -replace "[\[\]]","" -replace ":",""
 
             $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
