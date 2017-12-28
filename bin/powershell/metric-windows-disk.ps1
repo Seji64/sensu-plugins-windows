@@ -47,6 +47,10 @@ $instances =  @{}
 [void]$counters.Add('Avg. Disk sec/Read')
 [void]$counters.Add('Avg. Disk sec/Write')
 [void]$counters.Add('Current Disk Queue Length')
+[void]$counters.Add('Disk Transfers/sec')
+[void]$counters.Add('Disk Reads/sec')
+[void]$counters.Add('Disk Writes/sec')
+[void]$counters.Add('Split IO/sec')
 
 $perf_category = New-Object Diagnostics.PerformanceCounterCategory($Category)
 
@@ -85,6 +89,12 @@ foreach ($disk_instance in $perf_category.GetInstanceNames()) {
             if ($counter -eq 'Avg. Disk sec/Read') { Write-Host "$Path.disk.iostat.$diskname.read_await $value $Time" }
             if ($counter -eq 'Avg. Disk sec/Write') { Write-Host "$Path.disk.iostat.$diskname.write_await $value $Time" }
             if ($counter -eq 'Current Disk Queue Length') { Write-Host "$Path.disk.iostat.$diskname.queue_lenght $value $Time" }
+			if ($counter -eq 'Avg. Disk Read Queue Length') { Write-Host "$Path.disk.iostat.$diskname.avg_read_queue_lenght $value $Time" }
+            if ($counter -eq 'Avg. Disk Write Queue Length') { Write-Host "$Path.disk.iostat.$diskname.avg_read_queue_lenght $value $Time" }
+            if ($counter -eq 'Disk Transfers/sec') { Write-Host "$Path.disk.iostat.$diskname.tranfers_sec $value $Time" }
+            if ($counter -eq 'Disk Reads/sec') { Write-Host "$Path.disk.iostat.$diskname.reads_sec $value $Time" }
+            if ($counter -eq 'Disk Writes/sec') { Write-Host "$Path.disk.iostat.$diskname.writes_sec $value $Time" }
+            if ($counter -eq 'Split IO/sec') { Write-Host "$Path.disk.iostat.$diskname.split_io_sec $value $Time" }
 
         }
 
