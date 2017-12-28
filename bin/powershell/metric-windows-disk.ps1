@@ -69,6 +69,13 @@ foreach ($disk_instance in $perf_category.GetInstanceNames()) {
             $instance_counter.InstanceName = $disk_instance
 	        $instance_counter.CounterName = $counter
 
+			if ($disk) { # Chek if DiskName is empty. Eg. StorageSpaces is used
+                $diskname = $disk.ToString()
+            }
+            else {
+                $diskname = $disk_instance.toString()
+            }
+
             $Time = DateTimeToUnixTimestamp -DateTime (Get-Date)
 
             $value = 1..10|%{$instance_counter.NextValue();sleep -m 100} | Measure-Object -Average |select -expand average
